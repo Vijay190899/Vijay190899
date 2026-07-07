@@ -5,7 +5,7 @@
 ### AI Engineer &middot; Applied AI Research
 
 <p>
-  <a href="mailto:vijayananthyt@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="email"/></a>
+  <a href="https://www.linkedin.com/in/vijay-karunanithi/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
   <a href="https://github.com/Vijay190899?tab=repositories"><img src="https://img.shields.io/badge/Portfolio-181717?style=for-the-badge&logo=github&logoColor=white" alt="portfolio"/></a>
   <img src="https://komarev.com/ghpvc/?username=Vijay190899&style=for-the-badge&color=2f81f7" alt="profile views"/>
 </p>
@@ -15,6 +15,23 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 </div>
 
 ---
+
+## GitHub metrics
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-calendar.svg" alt="contribution calendar"/>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-languages.svg" alt="languages"/>
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-achievements.svg" alt="achievements"/>
+</p>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Vijay190899/Vijay190899/output/pacman-contribution-graph-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Vijay190899/Vijay190899/output/pacman-contribution-graph.svg">
+  <img alt="Pac-Man contribution graph" src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/output/pacman-contribution-graph.svg">
+</picture>
 
 ## Current work
 
@@ -78,14 +95,4 @@ Each project ships with a test suite, CI, architecture decision records, and tec
   <img src="https://img.shields.io/badge/Ruff-D7FF64?style=for-the-badge&logo=ruff&logoColor=black"/>
   <img src="https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white"/>
   <img src="https://img.shields.io/badge/Pre--commit-FAB040?style=for-the-badge&logo=precommit&logoColor=black"/>
-</p>
-
-## GitHub metrics
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/github-metrics.svg" alt="GitHub metrics"/>
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/output/snake.svg" alt="contribution snake"/>
 </p>
