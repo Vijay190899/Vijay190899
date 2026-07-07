@@ -1,6 +1,7 @@
-<h1 align="center">Hi, I'm Vijay Ananth Karunanithi</h1>
+<h1 align="center">Vijay Ananth Karunanithi</h1>
+<h3 align="center">AI Engineer &middot; RAG &middot; Multi-agent systems &middot; LLMOps</h3>
 <p align="center">
-I build AI systems end to end: retrieval pipelines, multi-agent orchestration, and the infrastructure that keeps them honest in production. Working toward an AI engineering role in Berlin, and building my portfolio in the open along the way.
+I build AI systems end to end: retrieval pipelines that cite their sources, agent orchestration with humans in the loop where it counts, and the evaluation and observability layers that keep all of it honest in production. I work in the open; everything below is real, running code.
 </p>
 
 <p align="center">
@@ -9,7 +10,7 @@ I build AI systems end to end: retrieval pipelines, multi-agent orchestration, a
 
 ---
 
-## What I'm building
+## Current work
 
 | Project | What it does | Core stack |
 |---|---|---|
