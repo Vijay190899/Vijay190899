@@ -19,12 +19,12 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 ## GitHub metrics
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-calendar.svg" alt="contribution calendar"/>
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-languages.svg" alt="languages"/>
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-habits.svg" alt="coding habits"/>
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-languages.svg" alt="languages"/>
-  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/metrics-achievements.svg" alt="achievements"/>
+  <img src="https://github-profile-trophy.vercel.app/?username=Vijay190899&theme=darkhub&no-frame=true&row=1&column=7" alt="trophies"/>
 </p>
 
 <picture>
