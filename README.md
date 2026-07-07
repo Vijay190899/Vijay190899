@@ -19,8 +19,11 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 ## GitHub metrics
 
 <p align="center">
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/streak.svg" alt="contribution streaks"/>
+</p>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/languages.svg" alt="most used languages"/>
-  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/overview.svg" alt="profile overview"/>
 </p>
 
 <picture>
