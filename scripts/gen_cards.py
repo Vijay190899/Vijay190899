@@ -3,14 +3,16 @@
 Stdlib only. Produces two dark-themed cards in ./cards/:
 
 - streak.svg     : total contributions, current streak (flame ring), longest streak
-- languages.svg  : most used languages as a stacked bar with a legend
+- frameworks.svg : frameworks/tools across recent repos, stacked bar with legend
 
 Contribution counts come from GitHub's public per-user contributions calendar;
-language bytes come from the REST API.
+framework usage is detected from repo manifests (pyproject.toml, Dockerfile,
+CI workflows) for repos created on/after REPO_CUTOFF.
 
 Run: GITHUB_TOKEN=<token> python scripts/gen_cards.py
 """
 
+import base64
 import datetime
 import json
 import os
@@ -29,18 +31,47 @@ MUTED = "#8b949e"
 ACCENT = "#fb8c00"
 FONT = "font-family='Segoe UI, Ubuntu, Helvetica, Arial, sans-serif'"
 
-LANG_COLORS = {
-    "Python": "#3572A5",
-    "Jupyter Notebook": "#DA5B0B",
-    "Shell": "#89e051",
-    "Makefile": "#427819",
-    "Dockerfile": "#384d54",
-    "HTML": "#e34c26",
-    "CSS": "#663399",
-    "JavaScript": "#f1e05a",
-    "TypeScript": "#3178c6",
+# Only repos created on or after this date count toward the frameworks card
+# (keeps old notebook-era repos from skewing the picture).
+REPO_CUTOFF = "2025-01-01"
+
+GRADIENTS = (
+    "<defs>"
+    "<linearGradient id='gTotal' x1='0' y1='0' x2='1' y2='1'>"
+    "<stop offset='0%' stop-color='#58a6ff'/><stop offset='100%' stop-color='#bc8cff'/>"
+    "</linearGradient>"
+    "<linearGradient id='gStreak' x1='0' y1='0' x2='0' y2='1'>"
+    "<stop offset='0%' stop-color='#ffb347'/><stop offset='100%' stop-color='#ff5252'/>"
+    "</linearGradient>"
+    "<linearGradient id='gLongest' x1='0' y1='0' x2='1' y2='1'>"
+    "<stop offset='0%' stop-color='#56d364'/><stop offset='100%' stop-color='#39d3d3'/>"
+    "</linearGradient>"
+    "<linearGradient id='gBorder' x1='0' y1='0' x2='1' y2='0'>"
+    "<stop offset='0%' stop-color='#58a6ff'/><stop offset='50%' stop-color='#bc8cff'/>"
+    "<stop offset='100%' stop-color='#ff9800'/>"
+    "</linearGradient>"
+    "<linearGradient id='gTitle' x1='0' y1='0' x2='1' y2='0'>"
+    "<stop offset='0%' stop-color='#ff9800'/><stop offset='100%' stop-color='#f778ba'/>"
+    "</linearGradient>"
+    "</defs>"
+)
+
+# Framework detection: token searched in repo manifests -> (label, color).
+# Deliberately excludes uniform tooling (pytest, ruff, CI): present in every
+# repo, so it carries no information here. Dict order breaks ranking ties.
+FRAMEWORKS = {
+    "langgraph": ("LangGraph", "#4db6ac"),
+    "crewai": ("CrewAI", "#ff5a50"),
+    "langchain": ("LangChain", "#86efac"),
+    "mcp": ("MCP", "#ffa657"),
+    "openai": ("OpenAI", "#74aa9c"),
+    "fastapi": ("FastAPI", "#009688"),
+    "langfuse": ("Langfuse", "#bc8cff"),
+    "qdrant": ("Qdrant", "#dc244c"),
+    "redis": ("Redis", "#ff4438"),
+    "pydantic": ("Pydantic", "#e92063"),
 }
-FALLBACK_COLORS = ["#58a6ff", "#3fb950", "#d29922", "#f778ba", "#a371f7", "#39d3d3"]
+DOCKER_COLOR = "#2496ed"
 
 WORDS_TO_NUM = {"No": 0}
 
@@ -154,9 +185,9 @@ def fmt_range(a: datetime.date, b: datetime.date) -> str:
 def card(width: int, height: int, body: str) -> str:
     return (
         f"<svg xmlns='http://www.w3.org/2000/svg' width='{width}' height='{height}' "
-        f"viewBox='0 0 {width} {height}'>"
-        f"<rect x='0.5' y='0.5' width='{width - 1}' height='{height - 1}' rx='6' "
-        f"fill='{BG}' stroke='{BORDER}'/>{body}</svg>"
+        f"viewBox='0 0 {width} {height}'>{GRADIENTS}"
+        f"<rect x='1' y='1' width='{width - 2}' height='{height - 2}' rx='8' "
+        f"fill='{BG}' stroke='url(#gBorder)' stroke-width='1.5'/>{body}</svg>"
     )
 
 
@@ -171,7 +202,7 @@ def build_streak_card(stats: dict) -> str:
 
     # Left: total contributions
     body.append(
-        f"<text x='{col}' y='92' text-anchor='middle' fill='{TEXT}' font-size='34' "
+        f"<text x='{col}' y='92' text-anchor='middle' fill='url(#gTotal)' font-size='34' "
         f"font-weight='700' {FONT}>{stats['total']}</text>"
     )
     body.append(
@@ -186,12 +217,12 @@ def build_streak_card(stats: dict) -> str:
     # Middle: current streak inside a flame ring
     cx = 3 * col
     body.append(
-        f"<circle cx='{cx}' cy='92' r='44' fill='none' stroke='{ACCENT}' stroke-width='5'/>"
+        f"<circle cx='{cx}' cy='92' r='44' fill='none' stroke='url(#gStreak)' stroke-width='5'/>"
     )
     # Small flame at the top of the ring
     body.append(
         f"<path d='M {cx} 34 c -5 8 -8 11 -8 17 a 8 8 0 0 0 16 0 c 0 -6 -3 -9 -8 -17 z' "
-        f"fill='{BG}' stroke='{ACCENT}' stroke-width='3'/>"
+        f"fill='{BG}' stroke='url(#gStreak)' stroke-width='3'/>"
     )
     body.append(
         f"<text x='{cx}' y='103' text-anchor='middle' fill='{TEXT}' font-size='32' "
@@ -208,7 +239,7 @@ def build_streak_card(stats: dict) -> str:
 
     # Right: longest streak
     body.append(
-        f"<text x='{5 * col}' y='92' text-anchor='middle' fill='{TEXT}' font-size='34' "
+        f"<text x='{5 * col}' y='92' text-anchor='middle' fill='url(#gLongest)' font-size='34' "
         f"font-weight='700' {FONT}>{stats['longest']}</text>"
     )
     body.append(
@@ -222,26 +253,57 @@ def build_streak_card(stats: dict) -> str:
     return card(width, height, "".join(body))
 
 
-def build_languages_card() -> str:
-    repos = [r for r in api(f"/users/{USER}/repos?per_page=100&type=owner") if not r["fork"]]
-    totals: dict[str, int] = {}
+def repo_file(full_name: str, path: str) -> str:
+    """A file's text content, or empty string when it doesn't exist."""
+    try:
+        payload = api(f"/repos/{full_name}/contents/{path}")
+        return base64.b64decode(payload["content"]).decode(errors="ignore")
+    except Exception:
+        return ""
+
+
+def framework_usage() -> list[tuple[str, float, str]]:
+    """(label, share, color) for frameworks/tools across recent repos.
+
+    A framework counts once per repo where it appears in the dependency
+    manifest; Docker counts by Dockerfile presence. Shares are fractions of
+    all mentions. Only repos created on/after REPO_CUTOFF count.
+    """
+    repos = [
+        r
+        for r in api(f"/users/{USER}/repos?per_page=100&type=owner")
+        if not r["fork"] and r["created_at"][:10] >= REPO_CUTOFF
+    ]
+    counts: dict[str, tuple[int, str]] = {}
+
+    def bump(label: str, color: str) -> None:
+        count, _ = counts.get(label, (0, color))
+        counts[label] = (count + 1, color)
+
     for repo in repos:
-        for lang, size in api(f"/repos/{repo['full_name']}/languages").items():
-            totals[lang] = totals.get(lang, 0) + size
+        manifest = repo_file(repo["full_name"], "pyproject.toml")
+        for token, (label, color) in FRAMEWORKS.items():
+            if re.search(rf"\b{token}", manifest):
+                bump(label, color)
+        if repo_file(repo["full_name"], "Dockerfile"):
+            bump("Docker", DOCKER_COLOR)
 
-    ranked = sorted(totals.items(), key=lambda kv: kv[1], reverse=True)[:6]
-    total = sum(size for _, size in ranked) or 1
-    shares = []
-    for i, (lang, size) in enumerate(ranked):
-        color = LANG_COLORS.get(lang, FALLBACK_COLORS[i % len(FALLBACK_COLORS)])
-        shares.append((lang, size / total, color))
+    # Rank by mentions; break ties by FRAMEWORKS order so the agentic stack
+    # (LangGraph, CrewAI, MCP...) outranks supporting libraries.
+    priority = {label: i for i, (label, _) in enumerate(FRAMEWORKS.values())}
+    ranked = sorted(counts.items(), key=lambda kv: (-kv[1][0], priority.get(kv[0], 99)))[:10]
+    total = sum(count for _, (count, _) in ranked) or 1
+    return [(label, count / total, color) for label, (count, color) in ranked]
 
+
+def build_frameworks_card() -> str:
+    shares = framework_usage()
     width = 480
     rows = (len(shares) + 1) // 2
     height = 118 + rows * 34
     body = [
-        f"<text x='24' y='42' fill='{ACCENT}' font-size='20' font-weight='700' {FONT}>"
-        f"Most Used Languages</text>"
+        f"<text x='24' y='42' fill='url(#gTitle)' font-size='20' font-weight='700' {FONT}>"
+        f"Frameworks and Tools</text>"
     ]
 
     # Stacked bar
@@ -272,7 +334,7 @@ def main() -> None:
     OUT.mkdir(exist_ok=True)
     stats = streaks(contribution_days())
     (OUT / "streak.svg").write_text(build_streak_card(stats), encoding="utf-8")
-    (OUT / "languages.svg").write_text(build_languages_card(), encoding="utf-8")
+    (OUT / "frameworks.svg").write_text(build_frameworks_card(), encoding="utf-8")
     print(f"total={stats['total']} current={stats['current']} longest={stats['longest']}")
 
 

@@ -23,7 +23,7 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/languages.svg" alt="most used languages"/>
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/frameworks.svg" alt="frameworks and tools"/>
 </p>
 
 <picture>
