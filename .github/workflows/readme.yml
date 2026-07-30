@@ -1,0 +1,45 @@
+name: Refresh README sections
+
+on:
+  schedule:
+    - cron: "20 4 * * *"
+  workflow_dispatch:
+  # Optional: a project repo can fire this to refresh immediately on push.
+  # See scripts/README-automation.md for the dispatch snippet.
+  repository_dispatch:
+    types: [refresh-readme]
+  push:
+    branches: [main]
+    paths-ignore:
+      - README.md
+
+permissions:
+  contents: write
+
+# Never run two refreshes at once; a newer push supersedes an in-flight run.
+concurrency:
+  group: refresh-readme
+  cancel-in-progress: true
+
+jobs:
+  readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate dynamic sections
+        run: python scripts/gen_readme.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- README.md; then
+            echo "README unchanged, nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: refresh dynamic README sections [skip ci]"
+          git push

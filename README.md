@@ -34,16 +34,19 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 
 ## Current work
 
+<!-- CURRENT_WORK:START -->
 | Project | What it does | Core stack |
 |---|---|---|
-| [supply-chain-agent-orchestrator](https://github.com/Vijay190899/supply-chain-agent-orchestrator) | Multi-agent logistics disruption response with a durable human-approval gate, an MCP tool server, and a written LangGraph vs CrewAI benchmark | LangGraph, CrewAI, MCP, Langfuse, SQLite checkpoints |
-| [finrag-compliance-agent](https://github.com/Vijay190899/finrag-compliance-agent) | Retrieval over financial filings that cites the exact page and region for every claim, with self-correction before answering | FastAPI, Qdrant, hybrid retrieval, OpenAI Agents SDK, Ragas |
-| [llm-gateway-observability](https://github.com/Vijay190899/llm-gateway-observability) | A single gateway in front of LLM providers: semantic caching, guardrails, rate limits, cost and latency tracking | FastAPI, Redis, Langfuse, EKS, Terraform |
+| [supply-chain-agent-orchestrator](https://github.com/Vijay190899/supply-chain-agent-orchestrator) | Multi-agent logistics disruption response with a durable human-approval gate, an MCP tool server, and a written LangGraph vs CrewAI benchmark | LangChain, LangGraph, CrewAI, OpenAI, MCP, SQLite |
+| [disclosure-rag](https://github.com/Vijay190899/disclosure-rag) | Retrieval over financial filings that cites the exact page and region for every claim, with self-correction before answering | PyTorch, Qdrant, FastAPI, Pydantic, Docker, Hybrid retrieval |
+| [llm-gateway-observability](https://github.com/Vijay190899/llm-gateway-observability) | A single gateway in front of LLM providers: semantic caching, guardrails, rate limits, cost and latency tracking | Langfuse, FastAPI, Pydantic, Redis, EKS, Terraform |
+<!-- CURRENT_WORK:END -->
 
 Each project ships with a test suite, CI, architecture decision records, and technical documentation.
 
 ## Stack
 
+<!-- STACK:START -->
 **AI and agents**
 
 <p>
@@ -95,3 +98,4 @@ Each project ships with a test suite, CI, architecture decision records, and tec
   <img src="https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white"/>
   <img src="https://img.shields.io/badge/Pre--commit-FAB040?style=for-the-badge&logo=precommit&logoColor=black"/>
 </p>
+<!-- STACK:END -->
