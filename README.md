@@ -7,6 +7,7 @@
 <p>
   <a href="https://www.linkedin.com/in/vijay-karunanithi/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
   <a href="https://github.com/Vijay190899?tab=repositories"><img src="https://img.shields.io/badge/Portfolio-181717?style=for-the-badge&logo=github&logoColor=white" alt="portfolio"/></a>
+  <a href="https://orcid.org/0009-0006-2454-2340"><img src="https://img.shields.io/badge/ORCID-A6CE39?style=for-the-badge&logo=orcid&logoColor=white" alt="ORCID 0009-0006-2454-2340"/></a>
   <img src="https://komarev.com/ghpvc/?username=Vijay190899&style=for-the-badge&color=2f81f7" alt="profile views"/>
 </p>
 
@@ -24,6 +25,7 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/frameworks.svg" alt="frameworks and tools"/>
+  <img src="https://raw.githubusercontent.com/Vijay190899/Vijay190899/metrics/languages.svg" alt="languages by bytes written"/>
 </p>
 
 <picture>
@@ -37,9 +39,9 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 <!-- CURRENT_WORK:START -->
 | Project | What it does | Core stack |
 |---|---|---|
-| [supply-chain-agent-orchestrator](https://github.com/Vijay190899/supply-chain-agent-orchestrator) | Multi-agent logistics disruption response with a durable human-approval gate, an MCP tool server, and a written LangGraph vs CrewAI benchmark | LangChain, LangGraph, CrewAI, OpenAI, MCP, SQLite |
-| [disclosure-rag](https://github.com/Vijay190899/disclosure-rag) | Retrieval over financial filings that cites the exact page and region for every claim, with self-correction before answering | PyTorch, Qdrant, FastAPI, Pydantic, Docker, Hybrid retrieval |
-| [llm-gateway-observability](https://github.com/Vijay190899/llm-gateway-observability) | A single gateway in front of LLM providers: semantic caching, guardrails, rate limits, cost and latency tracking | Langfuse, FastAPI, Pydantic, Redis, EKS, Terraform |
+| [supply-chain-agent-orchestrator](https://github.com/Vijay190899/supply-chain-agent-orchestrator) | Multi-agent logistics disruption response with a durable human-approval gate, an MCP tool server, and a written LangGraph vs CrewAI benchmark | LangGraph, CrewAI, LangChain, MCP, OpenAI, SQLite |
+| [disclosure-rag](https://github.com/Vijay190899/disclosure-rag) | Retrieval over financial filings that cites the exact page and region for every claim, with self-correction before answering | PyTorch, FastAPI, Pydantic, Qdrant, Docker, Hybrid retrieval |
+| [llm-gateway-observability](https://github.com/Vijay190899/llm-gateway-observability) | A single gateway in front of LLM providers: semantic caching, guardrails, rate limits, cost and latency tracking | OpenAI, Anthropic, Langfuse, FastAPI, EKS, Terraform |
 <!-- CURRENT_WORK:END -->
 
 Each project ships with a test suite, CI, architecture decision records, and technical documentation.
@@ -60,6 +62,9 @@ Each project ships with a test suite, CI, architecture decision records, and tec
   <img src="https://img.shields.io/badge/MCP-000000?style=for-the-badge&logo=modelcontextprotocol&logoColor=white"/>
   <img src="https://img.shields.io/badge/Qdrant-DC244C?style=for-the-badge&logo=qdrant&logoColor=white"/>
   <img src="https://img.shields.io/badge/Langfuse-000000?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Groq-F55036?style=for-the-badge&logo=groq&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Anthropic-191919?style=for-the-badge&logo=anthropic&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white"/>
 </p>
 
 **Backend and data**
@@ -74,6 +79,21 @@ Each project ships with a test suite, CI, architecture decision records, and tec
   <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white"/>
   <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white"/>
   <img src="https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Chroma-FF6F61?style=for-the-badge"/>
+</p>
+
+**Web and interfaces**
+
+<p>
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/>
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/>
+  <img src="https://img.shields.io/badge/React-149ECA?style=for-the-badge&logo=react&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white"/>
 </p>
 
 **Cloud and operations**
@@ -97,5 +117,7 @@ Each project ships with a test suite, CI, architecture decision records, and tec
   <img src="https://img.shields.io/badge/Ruff-D7FF64?style=for-the-badge&logo=ruff&logoColor=black"/>
   <img src="https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white"/>
   <img src="https://img.shields.io/badge/Pre--commit-FAB040?style=for-the-badge&logo=precommit&logoColor=black"/>
+  <img src="https://img.shields.io/badge/LaTeX-008080?style=for-the-badge&logo=latex&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white"/>
 </p>
 <!-- STACK:END -->

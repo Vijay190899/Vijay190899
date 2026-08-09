@@ -1,28 +1,31 @@
 """Generate the profile's metric cards as SVGs.
 
-Stdlib only. Produces two dark-themed cards in ./cards/:
+Stdlib only. Produces three dark-themed cards in ./cards/:
 
 - streak.svg     : total contributions, current streak (flame ring), longest streak
-- frameworks.svg : frameworks/tools across recent repos, stacked bar with legend
+- frameworks.svg : frameworks and tools across every repo, stacked bar with legend
+- languages.svg  : languages by bytes written across every repo
 
-Contribution counts come from GitHub's public per-user contributions calendar;
-framework usage is detected from repo manifests (pyproject.toml, Dockerfile,
-CI workflows) for repos created on/after REPO_CUTOFF.
+Contribution counts come from GitHub's public per-user contributions calendar.
+The other two cards are built from every owned repo created on/after
+REPO_CUTOFF, private ones included: see ghdata.py for how a repo's stack is
+detected and what does (and does not) leave a private repo.
 
 Run: GITHUB_TOKEN=<token> python scripts/gen_cards.py
 """
 
-import base64
+import collections
 import datetime
-import json
-import os
 import pathlib
 import re
-import urllib.request
 
-USER = "Vijay190899"
-TOKEN = os.environ.get("GITHUB_TOKEN", "")
+import ghdata
+from ghdata import USER
+
 OUT = pathlib.Path("cards")
+
+# Legend slots per card. Two columns, so an even number fills the last row.
+CARD_ITEMS = 12
 
 BG = "#0d1117"
 BORDER = "#30363d"
@@ -30,10 +33,6 @@ TEXT = "#e6edf3"
 MUTED = "#8b949e"
 ACCENT = "#fb8c00"
 FONT = "font-family='Segoe UI, Ubuntu, Helvetica, Arial, sans-serif'"
-
-# Only repos created on or after this date count toward the frameworks card
-# (keeps old notebook-era repos from skewing the picture).
-REPO_CUTOFF = "2025-01-01"
 
 GRADIENTS = (
     "<defs>"
@@ -56,52 +55,24 @@ GRADIENTS = (
     "</defs>"
 )
 
-# Framework detection: token searched in repo manifests -> (label, color).
-# Deliberately excludes uniform tooling (pytest, ruff, CI): present in every
-# repo, so it carries no information here. Dict order breaks ranking ties.
-FRAMEWORKS = {
-    "langgraph": ("LangGraph", "#4db6ac"),
-    "crewai": ("CrewAI", "#ff5a50"),
-    "langchain": ("LangChain", "#86efac"),
-    "mcp": ("MCP", "#ffa657"),
-    "openai": ("OpenAI", "#74aa9c"),
-    "fastapi": ("FastAPI", "#009688"),
-    "langfuse": ("Langfuse", "#bc8cff"),
-    "qdrant": ("Qdrant", "#dc244c"),
-    "redis": ("Redis", "#ff4438"),
-    "pydantic": ("Pydantic", "#e92063"),
-}
-DOCKER_COLOR = "#2496ed"
-
 WORDS_TO_NUM = {"No": 0}
-
-
-def http_get(url: str, token: str = "") -> str:
-    headers = {"User-Agent": USER}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-        headers["Accept"] = "application/vnd.github+json"
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req) as response:
-        return response.read().decode()
-
-
-def api(path: str):
-    return json.loads(http_get(f"https://api.github.com{path}", TOKEN))
-
 
 # --- contribution data --------------------------------------------------------
 
 
 def contribution_days() -> dict[datetime.date, int]:
     """Daily contribution counts from account creation until today."""
-    created = datetime.date.fromisoformat(api(f"/users/{USER}")["created_at"][:10])
+    created = datetime.date.fromisoformat(
+        ghdata.api(f"/users/{USER}")["created_at"][:10]
+    )
     today = datetime.date.today()
     days: dict[datetime.date, int] = {}
     for year in range(created.year, today.year + 1):
-        html = http_get(
+        # Public calendar page, no token: the API has no equivalent REST route.
+        html = ghdata.http_get(
             f"https://github.com/users/{USER}/contributions"
-            f"?from={year}-01-01&to={year}-12-31"
+            f"?from={year}-01-01&to={year}-12-31",
+            token="",
         )
         # Map cell ids to dates, then tooltip text (which carries the count)
         # back to those ids.
@@ -253,89 +224,128 @@ def build_streak_card(stats: dict) -> str:
     return card(width, height, "".join(body))
 
 
-def repo_file(full_name: str, path: str) -> str:
-    """A file's text content, or empty string when it doesn't exist."""
-    try:
-        payload = api(f"/repos/{full_name}/contents/{path}")
-        return base64.b64decode(payload["content"]).decode(errors="ignore")
-    except Exception:
-        return ""
+def build_share_card(title: str, subtitle: str, shares: list[tuple[str, float, str]],
+                     bar_id: str, width: int = 520) -> str:
+    """A titled stacked bar over a two-column legend.
 
-
-def framework_usage() -> list[tuple[str, float, str]]:
-    """(label, share, color) for frameworks/tools across recent repos.
-
-    A framework counts once per repo where it appears in the dependency
-    manifest; Docker counts by Dockerfile presence. Shares are fractions of
-    all mentions. Only repos created on/after REPO_CUTOFF count.
+    `shares` is (label, fraction, color), already ranked and normalised. Both
+    the frameworks and the languages card are this shape, so they stay visually
+    identical while measuring different things.
     """
-    repos = [
-        r
-        for r in api(f"/users/{USER}/repos?per_page=100&type=owner")
-        if not r["fork"] and r["created_at"][:10] >= REPO_CUTOFF
-    ]
-    counts: dict[str, tuple[int, str]] = {}
-
-    def bump(label: str, color: str) -> None:
-        count, _ = counts.get(label, (0, color))
-        counts[label] = (count + 1, color)
-
-    for repo in repos:
-        manifest = repo_file(repo["full_name"], "pyproject.toml")
-        for token, (label, color) in FRAMEWORKS.items():
-            if re.search(rf"\b{token}", manifest):
-                bump(label, color)
-        if repo_file(repo["full_name"], "Dockerfile"):
-            bump("Docker", DOCKER_COLOR)
-
-    # Rank by mentions; break ties by FRAMEWORKS order so the agentic stack
-    # (LangGraph, CrewAI, MCP...) outranks supporting libraries.
-    priority = {label: i for i, (label, _) in enumerate(FRAMEWORKS.values())}
-    ranked = sorted(counts.items(), key=lambda kv: (-kv[1][0], priority.get(kv[0], 99)))[:10]
-    total = sum(count for _, (count, _) in ranked) or 1
-    return [(label, count / total, color) for label, (count, color) in ranked]
-
-
-def build_frameworks_card() -> str:
-    shares = framework_usage()
-    width = 480
     rows = (len(shares) + 1) // 2
-    height = 118 + rows * 34
+    height = 96 + rows * 34
     body = [
-        f"<text x='24' y='42' fill='url(#gTitle)' font-size='20' font-weight='700' {FONT}>"
-        f"Frameworks and Tools</text>"
+        f"<text x='24' y='40' fill='url(#gTitle)' font-size='20' font-weight='700' "
+        f"{FONT}>{title}</text>",
+        f"<text x='24' y='60' fill='{MUTED}' font-size='12' {FONT}>{subtitle}</text>",
     ]
 
-    # Stacked bar
-    bar_x, bar_y, bar_w, bar_h = 24, 64, width - 48, 12
-    body.append(f"<clipPath id='bar'><rect x='{bar_x}' y='{bar_y}' width='{bar_w}' height='{bar_h}' rx='6'/></clipPath>")
+    # Stacked bar. Segments overlap by 1px so hairline gaps never show between
+    # them; the clip path keeps the rounded ends clean.
+    bar_x, bar_y, bar_w, bar_h = 24, 74, width - 48, 12
+    body.append(
+        f"<clipPath id='{bar_id}'><rect x='{bar_x}' y='{bar_y}' width='{bar_w}' "
+        f"height='{bar_h}' rx='6'/></clipPath>"
+    )
     x = float(bar_x)
     for _, fraction, color in shares:
         seg = fraction * bar_w
         body.append(
             f"<rect x='{x:.1f}' y='{bar_y}' width='{seg + 1:.1f}' height='{bar_h}' "
-            f"fill='{color}' clip-path='url(#bar)'/>"
+            f"fill='{color}' clip-path='url(#{bar_id})'/>"
         )
         x += seg
 
-    # Two-column legend
-    for i, (lang, fraction, color) in enumerate(shares):
+    for i, (label, fraction, color) in enumerate(shares):
         cx = 24 if i % 2 == 0 else width // 2 + 12
-        cy = 108 + (i // 2) * 34
+        cy = 116 + (i // 2) * 34
         body.append(f"<circle cx='{cx + 6}' cy='{cy - 5}' r='6' fill='{color}'/>")
         body.append(
-            f"<text x='{cx + 22}' y='{cy}' fill='{TEXT}' font-size='14' {FONT}>{lang} "
-            f"{fraction * 100:.2f}%</text>"
+            f"<text x='{cx + 22}' y='{cy}' fill='{TEXT}' font-size='14' {FONT}>"
+            f"{escape(label)} {fraction * 100:.2f}%</text>"
         )
     return card(width, height, "".join(body))
+
+
+def framework_shares(repos: list[dict]) -> list[tuple[str, float, str]]:
+    """(label, share, color) for frameworks and tools across every repo.
+
+    A framework counts once per repo it appears in, so a monorepo cannot
+    outvote the rest. Shares are fractions of the mentions actually shown.
+    """
+    counts: collections.Counter[str] = collections.Counter()
+    for repo in repos:
+        counts.update(
+            label for label in ghdata.detect_tech(repo) if ghdata.TECH[label].in_card
+        )
+
+    # Rank by repo count; break ties on catalog order so the agentic stack
+    # (LangGraph, CrewAI, MCP...) outranks supporting libraries.
+    ranked = sorted(
+        counts.items(), key=lambda kv: (-kv[1], ghdata.PRIORITY.get(kv[0], 999))
+    )[:CARD_ITEMS]
+    total = sum(count for _, count in ranked) or 1
+    return [(label, count / total, ghdata.TECH[label].color) for label, count in ranked]
+
+
+def language_shares(totals: dict[str, int],
+                    min_share: float = 0.005) -> list[tuple[str, float, str]]:
+    """(language, share, color) by bytes written, largest first.
+
+    Languages under `min_share` of the total are dropped rather than listed at
+    "0.05%", which reads as noise and renders as an invisible bar segment. The
+    remaining shares are renormalised so the legend sums to 100%.
+    """
+    grand = sum(totals.values()) or 1
+    ranked = [
+        (name, count) for name, count in totals.items()
+        if count / grand >= min_share
+    ][:CARD_ITEMS]
+    total = sum(count for _, count in ranked) or 1
+    return [
+        (name, count / total, ghdata.LANGUAGE_COLOR.get(name, ghdata.LANGUAGE_FALLBACK))
+        for name, count in ranked
+    ]
+
+
+def escape(text: str) -> str:
+    """XML-escape a label. Catalog entries are hand-written, but language names
+    come from the API and must not be able to break the document."""
+    return (
+        text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    )
 
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
     stats = streaks(contribution_days())
     (OUT / "streak.svg").write_text(build_streak_card(stats), encoding="utf-8")
-    (OUT / "frameworks.svg").write_text(build_frameworks_card(), encoding="utf-8")
-    print(f"total={stats['total']} current={stats['current']} longest={stats['longest']}")
+
+    repos = ghdata.owned_repos()
+    private = sum(1 for r in repos if r.get("private"))
+    scope = f"across {len(repos)} repositories"
+    if private:
+        scope += f", {private} of them private"
+
+    frameworks = framework_shares(repos)
+    (OUT / "frameworks.svg").write_text(
+        build_share_card("Frameworks and Tools", scope, frameworks, "barFw"),
+        encoding="utf-8",
+    )
+
+    languages = language_shares(ghdata.language_bytes(repos))
+    (OUT / "languages.svg").write_text(
+        build_share_card("Languages", f"by bytes written, {scope}", languages,
+                         "barLang"),
+        encoding="utf-8",
+    )
+
+    print(
+        f"total={stats['total']} current={stats['current']} "
+        f"longest={stats['longest']} repos={len(repos)} "
+        f"frameworks={[l for l, _, _ in frameworks]} "
+        f"languages={[l for l, _, _ in languages]}"
+    )
 
 
 if __name__ == "__main__":

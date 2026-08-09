@@ -16,10 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # METRICS_TOKEN is a PAT with read access to private repos, so the cards
+      # measure every repository. Without it the run still succeeds, but the
+      # frameworks and languages cards only see public repos.
       - name: Generate SVG cards
         run: python scripts/gen_cards.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Publish to metrics branch
         uses: crazy-max/ghaction-github-pages@v4

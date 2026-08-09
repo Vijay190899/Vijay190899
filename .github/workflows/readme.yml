@@ -27,10 +27,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # See cards.yml: METRICS_TOKEN widens detection to private repos, and the
+      # job degrades to public-only rather than failing when it is absent.
       - name: Regenerate dynamic sections
         run: python scripts/gen_readme.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Commit if changed
         run: |
