@@ -118,6 +118,7 @@ Each project ships with a test suite, CI, architecture decision records, and tec
   <img src="https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white"/>
   <img src="https://img.shields.io/badge/Pre--commit-FAB040?style=for-the-badge&logo=precommit&logoColor=black"/>
   <img src="https://img.shields.io/badge/LaTeX-008080?style=for-the-badge&logo=latex&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white"/>
   <img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white"/>
 </p>
 <!-- STACK:END -->
