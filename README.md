@@ -39,6 +39,7 @@ I design and build AI systems across the full stack: retrieval-augmented generat
 <!-- CURRENT_WORK:START -->
 | Project | What it does | Core stack |
 |---|---|---|
+| [preisspiegel](https://github.com/Vijay190899/preisspiegel) | Prices an electrical contractor's tender: every item matched to a supplier offer, only the decisions shown, every number traced to the page it came from ([live demo](https://preis-spiegel.vercel.app)) | Anthropic, TypeScript, React, Tailwind, Convex, TanStack |
 | [supply-chain-agent-orchestrator](https://github.com/Vijay190899/supply-chain-agent-orchestrator) | Multi-agent logistics disruption response with a durable human-approval gate, an MCP tool server, and a written LangGraph vs CrewAI benchmark | LangGraph, CrewAI, LangChain, MCP, OpenAI, SQLite |
 | [disclosure-rag](https://github.com/Vijay190899/disclosure-rag) | Retrieval over financial filings that cites the exact page and region for every claim, with self-correction before answering | PyTorch, FastAPI, Pydantic, Qdrant, Docker, Hybrid retrieval |
 | [llm-gateway-observability](https://github.com/Vijay190899/llm-gateway-observability) | A single gateway in front of LLM providers: semantic caching, guardrails, rate limits, cost and latency tracking | OpenAI, Anthropic, Langfuse, FastAPI, EKS, Terraform |
