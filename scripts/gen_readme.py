@@ -30,12 +30,18 @@ README = pathlib.Path("README.md")
 # GitHub description when a repo is not listed in DESCRIPTIONS. Every entry must
 # be a public repo; private ones are skipped at render time.
 FEATURED = [
+    "preisspiegel",
     "supply-chain-agent-orchestrator",
     "disclosure-rag",
     "llm-gateway-observability",
 ]
 
 DESCRIPTIONS = {
+    "preisspiegel": (
+        "Prices an electrical contractor's tender: every item matched to a supplier "
+        "offer, only the decisions shown, every number traced to the page it came "
+        "from ([live demo](https://preis-spiegel.vercel.app))"
+    ),
     "supply-chain-agent-orchestrator": (
         "Multi-agent logistics disruption response with a durable human-approval "
         "gate, an MCP tool server, and a written LangGraph vs CrewAI benchmark"
@@ -53,6 +59,7 @@ DESCRIPTIONS = {
 # Infra/technique labels that no manifest reliably reveals. Unioned with the
 # live-detected stack per featured repo so the column never loses them.
 STACK_OVERRIDE = {
+    "preisspiegel": ["Convex", "TanStack"],
     "supply-chain-agent-orchestrator": ["SQLite"],
     "disclosure-rag": ["Hybrid retrieval"],
     "llm-gateway-observability": ["EKS", "Terraform"],
